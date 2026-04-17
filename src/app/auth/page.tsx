@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
@@ -39,7 +39,7 @@ function getRedirectPath(): string {
   return '/dashboard';
 }
 
-export default function AuthPage() {
+function AuthPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = createClient();
@@ -226,5 +226,13 @@ export default function AuthPage() {
         </div>
       </div>
     </>
+  );
+}
+
+export default function AuthPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen" style={{ background: '#0f0f0f' }} />}>
+      <AuthPageContent />
+    </Suspense>
   );
 }
