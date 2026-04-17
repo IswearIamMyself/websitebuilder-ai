@@ -1,157 +1,227 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import SiteNav from '@/components/ui/site-nav';
 import { PromptInputBox } from '@/components/ui/ai-prompt-box';
 
-const css = `
-  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap');
-  * { font-family: 'Syne', sans-serif; }
+/* ─── CSS ────────────────────────────────────────────────────────────────────── */
 
-  @keyframes float1 {
-    0%,100% { transform: translate(0,0); }
-    50%      { transform: translate(40px,30px); }
+const css = `
+  @keyframes auroraShift {
+    0%   { transform: scale(1) translate(0, 0); }
+    50%  { transform: scale(1.06) translate(1.5%, -1%); }
+    100% { transform: scale(1) translate(0, 0); }
   }
-  @keyframes float2 {
-    0%,100% { transform: translate(0,0); }
-    50%      { transform: translate(-30px,40px); }
-  }
-  @keyframes slideLeft {
+  @keyframes slide {
     from { transform: translateX(0); }
     to   { transform: translateX(-50%); }
   }
-  @keyframes slideRight {
-    from { transform: translateX(-50%); }
-    to   { transform: translateX(0); }
-  }
-  @keyframes termFade {
-    from { opacity: 0; transform: translateX(-8px); }
-    to   { opacity: 1; transform: translateX(0); }
-  }
-  .term-line { opacity: 0; animation: termFade 0.4s ease forwards; }
-  .term-1 { animation-delay: 0.3s; }
-  .term-2 { animation-delay: 0.9s; }
-  .term-3 { animation-delay: 1.5s; }
-  .term-4 { animation-delay: 2.1s; }
-  .term-5 { animation-delay: 2.8s; }
-  .term-6 { animation-delay: 3.5s; }
 `;
 
-const ROW1 = [
-  'WebElite','Novarte','SalCar','ClimateTech','AgênciaForte',
-  'StudioNova','BrandLab','PixelAgency','WebElite','Novarte',
-  'SalCar','ClimateTech','AgênciaForte','StudioNova',
-];
-const ROW2 = [
-  'FlowAgency','CreativeHub','DigitalWave','MediaCraft','ProBuild',
-  'NexaDesign','SwiftSites','BoldStudio','FlowAgency','CreativeHub',
-  'DigitalWave','MediaCraft','ProBuild','NexaDesign',
+const AURORA = [
+  'radial-gradient(ellipse 80% 60% at 20% 30%, rgba(99,60,180,0.8) 0%, transparent 60%)',
+  'radial-gradient(ellipse 60% 80% at 70% 60%, rgba(219,39,119,0.7) 0%, transparent 55%)',
+  'radial-gradient(ellipse 50% 50% at 50% 80%, rgba(249,115,22,0.5) 0%, transparent 60%)',
+  '#0a0a0f',
+].join(', ');
+
+/* ─── Data ───────────────────────────────────────────────────────────────────── */
+
+const LOGOS = [
+  'WebElite', 'Novarte', 'ClimateTech', 'AgênciaForte', 'StudioNova',
+  'BoldBrand', 'PixelShift', 'NexaWeb', 'Craftworks', 'SwiftSites',
+  'WebElite', 'Novarte', 'ClimateTech', 'AgênciaForte', 'StudioNova',
+  'BoldBrand', 'PixelShift', 'NexaWeb', 'Craftworks', 'SwiftSites',
 ];
 
-/* ── Feature visuals ─────────────────────────────────────────────────────────── */
+const TESTIMONIALS = [
+  {
+    quote: "Vibbr built a complete landing page for my restaurant in under a minute. The SEO tags were already there. I didn't touch a line of code.",
+    name: 'Maria Santos',
+    role: 'Restaurant Owner',
+  },
+  {
+    quote: "I use Vibbr for every client discovery call. I generate a site from their brief in front of them. They always say yes on the spot.",
+    name: 'Ricardo Fonseca',
+    role: 'Web Agency Owner',
+  },
+  {
+    quote: "The edit feature is insane. I typed 'make it darker and add a WhatsApp button' and it just did it. My clients love the results.",
+    name: 'Ana Pereira',
+    role: 'Freelance Designer',
+  },
+];
 
-function TerminalCard() {
+const FAQS = [
+  {
+    q: 'Do I need to know how to code?',
+    a: 'Not at all. Vibbr generates complete websites from plain English descriptions. Just describe your business and we handle everything else.',
+  },
+  {
+    q: 'What does Vibbr actually generate?',
+    a: 'Vibbr creates complete HTML, CSS and JavaScript files — real production code, not a page builder. You can download the files, host them anywhere, or use your vibbr.app subdomain.',
+  },
+  {
+    q: 'Is SEO really included?',
+    a: 'Yes, automatically. Every site includes meta tags, Open Graph, JSON-LD schema markup, a canonical URL, and a sitemap.xml — without you configuring anything.',
+  },
+  {
+    q: 'Can I use my own domain?',
+    a: 'Yes. Free plan includes a yoursite.vibbr.app subdomain. Starter and Pro plans let you connect any custom domain with a simple CNAME record.',
+  },
+  {
+    q: "How do I edit a site after it's generated?",
+    a: "Type what you want changed in plain English — 'make the hero darker' or 'add a contact form' — and Vibbr updates the files and reloads the preview.",
+  },
+  {
+    q: 'What happens if I run out of credits?',
+    a: 'You can buy more anytime from your dashboard. Credit packs start at €7 for 10 credits. No subscription required.',
+  },
+];
+
+/* ─── Feature mockup visuals ─────────────────────────────────────────────────── */
+
+function TerminalMockup() {
   return (
-    <div className="w-full h-full bg-[#141414] border border-white/5 rounded-2xl p-6 font-mono text-xs flex flex-col gap-2">
-      <p className="term-line term-1 text-green-400">✓ index.html generated</p>
-      <p className="term-line term-2 text-green-400">✓ css/style.css generated</p>
-      <p className="term-line term-3 text-green-400">✓ js/main.js generated</p>
-      <p className="term-line term-4 text-green-400">✓ sitemap.xml generated</p>
-      <p className="term-line term-5 text-zinc-500">→ Deploying to mysite.vibbr.app...</p>
-      <p className="term-line term-6 text-green-400 font-semibold">✓ Live in 14 seconds</p>
+    <div className="rounded-xl overflow-hidden border border-zinc-100 shadow-sm">
+      <div className="h-24" style={{ background: 'linear-gradient(135deg, #ec4899, #8b5cf6)' }} />
+      <div className="bg-white p-6">
+        <div className="rounded-lg p-4" style={{ background: '#0a0a0a', fontFamily: 'monospace', fontSize: 12 }}>
+          <p className="text-green-400">✓ index.html</p>
+          <p className="text-green-400 mt-1.5">✓ css/style.css</p>
+          <p className="text-green-400 mt-1.5">✓ js/main.js</p>
+          <p className="text-green-400 mt-1.5">✓ sitemap.xml</p>
+          <p className="text-zinc-500 mt-2.5">→ Live at mysite.vibbr.app</p>
+        </div>
+      </div>
     </div>
   );
 }
 
-function SeoCard() {
-  const rows = ['Meta tags', 'Schema markup', 'Open Graph', 'Sitemap'];
+function SeoMockup() {
+  const rows = ['Meta tags complete', 'Schema markup found', 'Open Graph tags set', 'Sitemap detected'];
   return (
-    <div className="w-full h-full bg-[#141414] border border-white/5 rounded-2xl p-6 flex flex-col justify-center gap-5">
-      <div className="flex items-baseline gap-3">
-        <span className="text-5xl font-bold text-green-400">94</span>
-        <span className="text-sm text-zinc-400">SEO Score</span>
+    <div className="rounded-xl overflow-hidden border border-zinc-100 shadow-sm">
+      <div className="h-24" style={{ background: 'linear-gradient(135deg, #f97316, #ec4899)' }} />
+      <div className="bg-white p-6">
+        <div className="flex items-baseline gap-3 mb-4">
+          <span className="text-4xl font-bold text-green-600">94</span>
+          <span className="text-sm text-zinc-400">SEO Score</span>
+        </div>
+        <div className="flex flex-col gap-2">
+          {rows.map((row) => (
+            <div key={row} className="flex justify-between items-center text-sm border-b border-zinc-50 pb-2 last:border-0 last:pb-0">
+              <span className="text-zinc-700">{row}</span>
+              <span className="text-green-500 font-bold">✓</span>
+            </div>
+          ))}
+        </div>
       </div>
-      <div className="flex flex-col gap-2">
-        {rows.map((row) => (
-          <div key={row} className="flex items-center justify-between bg-white/5 rounded-lg px-4 py-2">
-            <span className="text-xs text-zinc-300">{row}</span>
-            <span className="text-green-400 text-xs font-semibold">✓</span>
+    </div>
+  );
+}
+
+function EditMockup() {
+  return (
+    <div className="rounded-xl overflow-hidden border border-zinc-100 shadow-sm">
+      <div className="h-24" style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }} />
+      <div className="bg-white p-6">
+        <p className="text-xs text-zinc-400 uppercase tracking-wider mb-3">Edit with AI</p>
+        <div className="bg-zinc-50 rounded-lg p-3 text-sm text-zinc-700 mb-2">
+          Make the hero section taller with a larger heading
+        </div>
+        <div className="bg-zinc-50 rounded-lg p-3 text-sm text-zinc-700 mb-3">
+          Change the color scheme to dark green and white
+        </div>
+        <div className="bg-zinc-100 rounded-lg px-3 py-2 text-sm text-zinc-400">
+          Add a WhatsApp button...
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Feature row ────────────────────────────────────────────────────────────── */
+
+type Sub = [string, string];
+
+interface FeatureRowProps {
+  title: string;
+  description: string;
+  subs: Sub[];
+  mockup: React.ReactNode;
+  visualLeft: boolean;
+}
+
+function FeatureRow({ title, description, subs, mockup, visualLeft }: FeatureRowProps) {
+  const text = (
+    <div>
+      <h3 className="text-2xl font-bold text-zinc-900 mb-3">{title}</h3>
+      <p className="text-zinc-500 text-base leading-relaxed mb-6">{description}</p>
+      <div>
+        {subs.map(([t, d]) => (
+          <div key={t} className="grid grid-cols-2 gap-4 border-b border-zinc-100 py-3 last:border-0">
+            <span className="font-semibold text-zinc-900 text-sm">{t}</span>
+            <span className="text-zinc-500 text-sm">{d}</span>
           </div>
         ))}
       </div>
     </div>
   );
-}
 
-function DomainCard() {
+  const visual = <div>{mockup}</div>;
+
   return (
-    <div className="w-full h-full bg-[#141414] border border-white/5 rounded-2xl p-6 flex flex-col justify-center gap-4">
-      <div className="flex gap-2">
-        <div className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-xs text-zinc-300 font-mono">
-          myclientsite.com
-        </div>
-        <button
-          type="button"
-          className="bg-orange-500 text-white text-xs font-semibold px-4 py-2.5 rounded-lg"
-        >
-          Connect
-        </button>
-      </div>
-      <div>
-        <p className="text-xs text-zinc-500 mb-2">Add this CNAME record:</p>
-        <div className="bg-black rounded-lg p-3 font-mono text-xs text-zinc-300">
-          * → sites.vibbr.app
-        </div>
-      </div>
-      <div className="inline-flex items-center gap-1.5 bg-green-500/10 border border-green-500/20 text-green-400 text-xs rounded-full px-3 py-1 w-fit">
-        Domain verified ✓
+    <div className="bg-white border border-zinc-100 rounded-2xl p-8 mb-6">
+      <div className="grid grid-cols-2 gap-12 items-center">
+        {visualLeft ? <>{visual}{text}</> : <>{text}{visual}</>}
       </div>
     </div>
   );
 }
 
-function EditCard() {
+/* ─── FAQ ────────────────────────────────────────────────────────────────────── */
+
+function FAQSection() {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
   return (
-    <div className="w-full h-full bg-[#141414] border border-white/5 rounded-2xl p-6 flex flex-col gap-3">
-      <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Edit with AI</p>
-      <div className="flex flex-col gap-2 flex-1">
-        <div className="bg-zinc-800 rounded-lg p-2.5 text-xs text-zinc-400">
-          Make the hero section taller
+    <section className="py-24 px-6" style={{ background: '#fff' }}>
+      <div className="max-w-4xl mx-auto flex gap-16">
+        <div className="w-1/3 shrink-0">
+          <h2 className="text-4xl font-bold text-zinc-900 leading-tight">
+            Frequently asked questions
+          </h2>
         </div>
-        <div className="bg-zinc-800 rounded-lg p-2.5 text-xs text-zinc-400">
-          Change font to something modern
+        <div className="flex-1">
+          {FAQS.map((faq, i) => (
+            <div key={i} className="border-b border-zinc-100 py-5">
+              <button
+                type="button"
+                className="flex justify-between items-center w-full text-left"
+                onClick={() => setOpenIndex(openIndex === i ? null : i)}
+              >
+                <span className="text-zinc-900 font-medium text-base">{faq.q}</span>
+                <span
+                  className="text-zinc-400 text-xl ml-4 shrink-0 transition-transform duration-200"
+                  style={{ display: 'inline-block', transform: openIndex === i ? 'rotate(45deg)' : 'none' }}
+                >
+                  +
+                </span>
+              </button>
+              {openIndex === i && (
+                <p className="text-zinc-500 text-sm leading-relaxed mt-3">{faq.a}</p>
+              )}
+            </div>
+          ))}
         </div>
       </div>
-      <div className="bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-xs text-zinc-600">
-        Add a contact form...
-      </div>
-    </div>
+    </section>
   );
 }
 
-interface FeatureRowProps {
-  reverse?: boolean;
-  title: string;
-  description: string;
-  visual: React.ReactNode;
-}
-
-function FeatureRow({ reverse, title, description, visual }: FeatureRowProps) {
-  return (
-    <div className={`flex items-center gap-16 ${reverse ? 'flex-row-reverse' : 'flex-row'}`}>
-      <div className="flex-1">
-        <h3 className="text-2xl font-bold text-white mb-4">{title}</h3>
-        <p className="text-zinc-400 leading-relaxed">{description}</p>
-      </div>
-      <div className="flex-1 h-72 rounded-2xl overflow-hidden">
-        {visual}
-      </div>
-    </div>
-  );
-}
-
-/* ── Main component ──────────────────────────────────────────────────────────── */
+/* ─── Main ───────────────────────────────────────────────────────────────────── */
 
 export default function LandingHero() {
   const router = useRouter();
@@ -166,190 +236,207 @@ export default function LandingHero() {
     <>
       <style>{css}</style>
 
-      {/* Mesh gradient background */}
-      <div className="fixed inset-0 bg-[#0a0a0a]" style={{ zIndex: 0 }}>
-        <div style={{
-          position: 'absolute', width: 600, height: 600,
-          top: -100, left: -200,
-          background: 'radial-gradient(circle, rgba(139,92,246,0.35) 0%, transparent 70%)',
-          filter: 'blur(80px)',
-          animation: 'float1 10s ease-in-out infinite',
-          pointerEvents: 'none',
-        }} />
-        <div style={{
-          position: 'absolute', width: 500, height: 500,
-          bottom: '10%', right: -150,
-          background: 'radial-gradient(circle, rgba(236,72,153,0.3) 0%, transparent 70%)',
-          filter: 'blur(80px)',
-          animation: 'float2 13s ease-in-out infinite',
-          pointerEvents: 'none',
-        }} />
-        <div style={{
-          position: 'absolute', width: 400, height: 400,
-          top: '30%', right: '20%',
-          background: 'radial-gradient(circle, rgba(249,115,22,0.2) 0%, transparent 70%)',
-          filter: 'blur(80px)',
-          animation: 'float1 8s ease-in-out 2s infinite',
-          pointerEvents: 'none',
-        }} />
-      </div>
-
-      <SiteNav />
-
-      {/* ── Hero ── */}
-      <section className="min-h-screen flex flex-col items-center justify-center pt-14 px-6 relative z-10 text-center">
-
-        {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs text-zinc-400 mb-8">
-          Now with SEO built in — every site, automatically
+      {/* Fixed nav */}
+      <nav
+        className="fixed top-0 left-0 right-0 h-14 flex items-center justify-between px-6 z-50 backdrop-blur-sm"
+        style={{ background: 'rgba(10,10,15,0.75)' }}
+      >
+        <Link href="/" className="flex items-center gap-2">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/vibbr-icon.png" alt="Vibbr" className="w-7 h-7 rounded-lg object-cover" />
+          <span className="font-semibold text-white text-lg">Vibbr</span>
+        </Link>
+        <div className="hidden md:flex items-center gap-8">
+          <Link href="/pricing" className="text-white/70 hover:text-white text-sm transition-colors">Pricing</Link>
+          <Link href="/blog" className="text-white/70 hover:text-white text-sm transition-colors">Blog</Link>
+          <Link href="#" className="text-white/70 hover:text-white text-sm transition-colors">Docs</Link>
         </div>
-
-        {/* Heading */}
-        <h1 style={{
-          fontSize: 'clamp(52px, 7vw, 88px)',
-          fontWeight: 800,
-          lineHeight: 0.95,
-          letterSpacing: '-0.04em',
-          color: 'white',
-          maxWidth: 900,
-          textAlign: 'center',
-        }}>
-          Build websites{' '}
-          <span style={{
-            background: 'linear-gradient(135deg, #f97316 0%, #ec4899 50%, #8b5cf6 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-          }}>
-            that actually rank
-          </span>
-        </h1>
-
-        {/* Subtext */}
-        <p className="text-zinc-400 text-lg max-w-lg mx-auto mt-6 mb-10 leading-relaxed">
-          Describe your business. Vibbr generates a complete,
-          SEO-optimized website and deploys it instantly.
-          No code. No design skills. No waiting.
-        </p>
-
-        {/* Prompt box */}
-        <div
-          className="max-w-2xl w-full mx-auto"
-          style={{
-            boxShadow: '0 0 80px rgba(139,92,246,0.12), 0 0 40px rgba(236,72,153,0.08)',
-            borderRadius: 16,
-          }}
-        >
-          <PromptInputBox
-            onSend={handleSend}
-            isLoading={false}
-            placeholder="e.g. A landing page for my Muay Thai gym in Lisbon..."
-          />
-        </div>
-
-        {/* Social proof */}
-        <div className="mt-6 flex items-center justify-center gap-6 text-xs text-zinc-600">
-          <span>2,400+ sites built</span>
-          <span>·</span>
-          <span>Average 18s generation</span>
-          <span>·</span>
-          <span>SEO score 94/100</span>
-        </div>
-      </section>
-
-      {/* ── Sliding logos ── */}
-      <section className="py-16 border-t border-white/5 relative z-10">
-        <p className="text-center text-xs text-zinc-600 uppercase tracking-widest mb-8">
-          Trusted by teams at
-        </p>
-        <div className="overflow-hidden mb-4">
-          <div style={{ display: 'flex', width: 'max-content', animation: 'slideLeft 25s linear infinite' }}>
-            {ROW1.map((name, i) => (
-              <span key={i} className="font-semibold text-zinc-700 text-lg mx-8 whitespace-nowrap">
-                {name}
-              </span>
-            ))}
-          </div>
-        </div>
-        <div className="overflow-hidden">
-          <div style={{ display: 'flex', width: 'max-content', animation: 'slideRight 30s linear infinite' }}>
-            {ROW2.map((name, i) => (
-              <span key={i} className="font-semibold text-zinc-700 text-lg mx-8 whitespace-nowrap">
-                {name}
-              </span>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Features ── */}
-      <section className="py-24 px-6 max-w-6xl mx-auto relative z-10">
-        <p className="text-xs text-zinc-600 uppercase tracking-widest text-center mb-4">
-          What you actually get
-        </p>
-        <h2 className="text-4xl font-bold text-white text-center mb-16">
-          Everything included.
-        </h2>
-        <div className="flex flex-col gap-24">
-          <FeatureRow
-            title="Claude generates your entire site"
-            description="Type what your business does. Claude writes clean HTML, CSS and JavaScript — with real content, not Lorem Ipsum. Every file is yours to download."
-            visual={<TerminalCard />}
-          />
-          <FeatureRow
-            reverse
-            title="SEO baked in from line one"
-            description="Every site gets meta tags, Open Graph, JSON-LD schema, canonical URLs and a sitemap automatically. No plugins. No setup. Your clients rank without lifting a finger."
-            visual={<SeoCard />}
-          />
-          <FeatureRow
-            title="Your client connects their domain"
-            description="Free subdomain on vibbr.app included. When they're ready, one CNAME record connects their custom domain. SSL automatic. Takes two minutes."
-            visual={<DomainCard />}
-          />
-          <FeatureRow
-            reverse
-            title="Edit with a follow-up prompt"
-            description="Not happy with the hero? Just say so. 'Make the header darker' or 'Add a WhatsApp button' — Vibbr edits the exact files and reloads the preview instantly."
-            visual={<EditCard />}
-          />
-        </div>
-      </section>
-
-      {/* ── Bottom CTA ── */}
-      <section className="py-32 px-6 text-center relative z-10">
-        <h2 className="text-5xl font-bold text-white mb-4">Start building today</h2>
-        <p className="text-zinc-400 mb-8">Free to try. No credit card. One generation on us.</p>
-        <div className="flex items-center justify-center gap-4">
+        <div className="flex items-center gap-2">
+          <Link href="/auth?mode=signin" className="text-white/70 hover:text-white text-sm px-4 py-2 transition-colors">
+            Log in
+          </Link>
           <Link
             href="/auth?mode=signup"
-            className="bg-white text-black font-semibold px-8 py-3 rounded-xl hover:bg-zinc-100 transition-colors"
+            className="bg-white text-black font-medium text-sm px-4 py-2 rounded-lg hover:bg-white/90 transition-colors"
           >
-            Get started free
+            Get started
           </Link>
-          <Link
-            href="/pricing"
-            className="border border-white/20 text-white px-8 py-3 rounded-xl hover:bg-white/5 transition-colors"
-          >
-            See pricing
-          </Link>
+        </div>
+      </nav>
+
+      {/* ── SECTION 1: Hero (dark) ── */}
+      <div style={{ background: '#0a0a0f', position: 'relative', overflow: 'hidden' }}>
+        <div
+          style={{
+            position: 'absolute', inset: 0,
+            background: AURORA,
+            animation: 'auroraShift 15s ease-in-out infinite alternate',
+            pointerEvents: 'none',
+          }}
+        />
+        <section className="relative z-10 min-h-screen flex flex-col items-center justify-center text-center px-6 pt-14">
+          <p className="text-white/60 text-sm mb-4">Build something Vibbr</p>
+
+          <h1 style={{
+            fontSize: 'clamp(48px, 8vw, 96px)',
+            fontWeight: 800,
+            color: 'white',
+            lineHeight: 1.0,
+            letterSpacing: '-0.03em',
+            maxWidth: 900,
+            textAlign: 'center',
+          }}>
+            Build your website with AI
+          </h1>
+
+          <p className="text-white/60 text-xl max-w-xl mx-auto mt-4 mb-8">
+            Create websites by describing what you want
+          </p>
+
+          <div className="max-w-2xl w-full mx-auto">
+            <div style={{
+              background: 'rgba(28,28,30,0.8)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: 16,
+              overflow: 'hidden',
+            }}>
+              <PromptInputBox
+                onSend={handleSend}
+                isLoading={false}
+                placeholder="e.g. A landing page for my Muay Thai gym in Lisbon..."
+              />
+            </div>
+          </div>
+        </section>
+      </div>
+
+      {/* ── SECTION 2: Logos (white) ── */}
+      <section className="py-16 border-t border-b border-zinc-100" style={{ background: '#fff' }}>
+        <p className="text-center text-zinc-400 text-sm mb-8">Used by teams at</p>
+        <div className="overflow-hidden">
+          <div style={{ display: 'flex', alignItems: 'center', width: 'max-content', animation: 'slide 30s linear infinite' }}>
+            {LOGOS.map((name, i) => (
+              <span key={i} className="font-semibold text-zinc-800 text-xl mx-10 whitespace-nowrap">
+                {name}
+              </span>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* ── Footer ── */}
-      <footer className="border-t border-white/5 py-8 px-6 relative z-10">
+      {/* ── SECTION 3 + 4: Features (cream) ── */}
+      <section style={{ background: '#FAF9F6' }} className="py-24 px-6">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-5xl font-bold text-zinc-900 max-w-lg leading-tight mb-16">
+            What businesses build with Vibbr
+          </h2>
+
+          <FeatureRow
+            visualLeft
+            title="AI generates your complete site"
+            description="Describe your business in plain language. Vibbr writes clean HTML, CSS and JavaScript with real content, real structure, and SEO built in from the first line."
+            subs={[
+              ['Real content', 'No Lorem Ipsum — actual business copy'],
+              ['Clean code', 'HTML, CSS, JS you can download and own'],
+              ['Instant preview', 'See your site in seconds, not days'],
+            ]}
+            mockup={<TerminalMockup />}
+          />
+
+          <FeatureRow
+            visualLeft={false}
+            title="SEO built in from line one"
+            description="Every site Vibbr generates includes meta tags, Open Graph, JSON-LD schema, canonical URLs and a sitemap. No plugins. No setup. Your clients rank on Google automatically."
+            subs={[
+              ['Meta tags', 'Title, description, OG tags on every page'],
+              ['Schema markup', 'JSON-LD for LocalBusiness automatically'],
+              ['Sitemap', 'XML sitemap generated and linked automatically'],
+            ]}
+            mockup={<SeoMockup />}
+          />
+
+          <FeatureRow
+            visualLeft
+            title="Edit with a follow-up prompt"
+            description="Not happy with the hero section? Just say so. Type what you want changed and Vibbr edits the exact files. The preview reloads instantly. No code required."
+            subs={[
+              ['Natural language', 'Say what you want, not how to code it'],
+              ['Targeted edits', 'Only the relevant files get updated'],
+              ['Instant reload', 'Preview updates immediately after edits'],
+            ]}
+            mockup={<EditMockup />}
+          />
+        </div>
+      </section>
+
+      {/* ── SECTION 5: Testimonials (cream) ── */}
+      <section style={{ background: '#FAF9F6' }} className="py-24 px-6">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-4xl font-bold text-zinc-900 mb-12">What builders say</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {TESTIMONIALS.map((t) => (
+              <div key={t.name} className="bg-white border border-zinc-100 rounded-2xl p-8">
+                <p className="text-zinc-700 text-base leading-relaxed mb-6">&ldquo;{t.quote}&rdquo;</p>
+                <div>
+                  <p className="font-semibold text-zinc-900 text-sm">{t.name}</p>
+                  <p className="text-zinc-400 text-sm">{t.role}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── SECTION 6: FAQ (white) ── */}
+      <FAQSection />
+
+      {/* ── SECTION 7: CTA (dark gradient) ── */}
+      <section style={{ background: '#0a0a0f', position: 'relative', overflow: 'hidden' }} className="py-32 px-6 text-center">
+        <div
+          style={{
+            position: 'absolute', inset: 0,
+            background: AURORA,
+            opacity: 0.75,
+            animation: 'auroraShift 15s ease-in-out infinite alternate',
+            pointerEvents: 'none',
+          }}
+        />
+        <div className="relative z-10">
+          <h2 className="text-5xl font-bold text-white mb-4">Dream it. Build it. Ship it.</h2>
+          <p className="text-white/60 text-lg mb-8">Start free. No credit card needed.</p>
+          <div className="flex items-center justify-center gap-4">
+            <Link
+              href="/auth?mode=signup"
+              className="bg-white text-black font-semibold px-8 py-3 rounded-xl hover:bg-white/90 transition-colors"
+            >
+              Get started free
+            </Link>
+            <Link
+              href="/pricing"
+              className="border border-white/20 text-white px-8 py-3 rounded-xl hover:bg-white/10 transition-colors"
+            >
+              See pricing
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Footer (white) ── */}
+      <footer className="border-t border-zinc-100 py-10 px-6" style={{ background: '#fff' }}>
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/vibbr-icon.png" alt="Vibbr" className="w-7 h-7 rounded-lg object-cover" />
-            <span className="font-semibold text-white text-base">Vibbr</span>
-            <span className="text-zinc-600 text-xs ml-2">© 2025</span>
+            <span className="font-semibold text-zinc-900">Vibbr</span>
+            <span className="text-zinc-400 text-xs ml-1">© 2025</span>
           </div>
-          <div className="flex items-center gap-6">
-            <Link href="#" className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors">Privacy</Link>
-            <Link href="#" className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors">Terms</Link>
-            <Link href="/blog" className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors">Blog</Link>
-            <Link href="/pricing" className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors">Pricing</Link>
+          <div className="flex items-center gap-8">
+            <Link href="#" className="text-zinc-400 text-sm hover:text-zinc-600 transition-colors">Privacy</Link>
+            <Link href="#" className="text-zinc-400 text-sm hover:text-zinc-600 transition-colors">Terms</Link>
+            <Link href="/blog" className="text-zinc-400 text-sm hover:text-zinc-600 transition-colors">Blog</Link>
+            <Link href="/pricing" className="text-zinc-400 text-sm hover:text-zinc-600 transition-colors">Pricing</Link>
           </div>
         </div>
       </footer>
