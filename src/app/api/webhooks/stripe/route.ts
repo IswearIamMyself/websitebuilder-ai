@@ -67,9 +67,9 @@ export async function POST(request: NextRequest): Promise<Response> {
       }
     } else if (event.type === 'invoice.payment_succeeded') {
       const invoice = event.data.object as Stripe.Invoice;
-      const subscriptionId = typeof invoice.subscription === 'string'
-        ? invoice.subscription
-        : invoice.subscription?.id;
+      const subscriptionId = typeof (invoice as Stripe.Invoice & { subscription?: string | Stripe.Subscription | null }).subscription === 'string'
+        ? (invoice as Stripe.Invoice & { subscription?: string | Stripe.Subscription | null }).subscription
+        : ((invoice as Stripe.Invoice & { subscription?: string | Stripe.Subscription | null }).subscription as Stripe.Subscription | null)?.id ?? null;
 
       if (subscriptionId) {
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
