@@ -13,9 +13,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Vibbr — AI Website Builder',
-  description: 'Describe your site, we build it.',
-  icons: { icon: '/vibbr-favicon.png', apple: '/vibbr-favicon.png' },
+  title: { default: 'Vibbr', template: '%s | Vibbr' },
+  description: 'AI-powered website builder. Describe it, we build it.',
+  icons: { icon: '/vibbr-icon.png', apple: '/vibbr-icon.png' },
+  metadataBase: new URL('https://vibbr.app'),
 };
 
 export default function RootLayout({
