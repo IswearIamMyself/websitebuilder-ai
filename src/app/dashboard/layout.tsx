@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import VibbrLogo from '@/components/ui/vibbr-logo';
+import { VibbrLogoHorizontal } from '@/components/ui/vibbr-logo';
 
 interface Site {
   id: string;
@@ -219,7 +219,7 @@ function Sidebar({
     >
       {/* ── Logo ── */}
       <div className="px-4 py-3 border-b border-white/5">
-        <VibbrLogo />
+        <VibbrLogoHorizontal />
       </div>
 
       {/* ── Workspace selector ── */}

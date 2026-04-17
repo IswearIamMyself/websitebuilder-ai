@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { PromptInputBox } from '@/components/ui/ai-prompt-box';
@@ -21,13 +21,15 @@ const CHIPS = [
 
 export default function DashboardPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createClient();
 
   const [sites, setSites] = useState<Site[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [chipPrompt, setChipPrompt] = useState('');
+
+  const autoSubmitFiredRef = useRef(false);
 
   useEffect(() => {
     async function fetchSites() {
@@ -43,6 +45,17 @@ export default function DashboardPage() {
     }
     fetchSites();
   }, []);
+
+  // Auto-submit prompt from URL param (set by landing page → auth flow)
+  useEffect(() => {
+    if (loading) return;
+    if (autoSubmitFiredRef.current) return;
+    const prompt = searchParams.get('prompt');
+    if (!prompt) return;
+    autoSubmitFiredRef.current = true;
+    const timer = setTimeout(() => handleSend(prompt), 500);
+    return () => clearTimeout(timer);
+  }, [loading, searchParams]);
 
   async function handleSend(message: string) {
     if (!message.trim()) return;
@@ -93,10 +106,9 @@ export default function DashboardPage() {
 
           <div className="w-full max-w-2xl mt-8">
             <PromptInputBox
-              key={chipPrompt || '__default__'}
               onSend={handleSend}
               isLoading={generating}
-              placeholder={chipPrompt || 'Describe the site you want to build...'}
+              placeholder="Describe the site you want to build..."
             />
             {error && (
               <p className="mt-3 text-sm text-red-400 text-center">{error}</p>
@@ -109,7 +121,7 @@ export default function DashboardPage() {
               <button
                 key={chip}
                 type="button"
-                onClick={() => setChipPrompt(chip)}
+                onClick={() => handleSend(chip)}
                 className="px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 text-sm text-zinc-300 cursor-pointer border border-white/8 transition-colors"
               >
                 {chip}
@@ -136,7 +148,8 @@ export default function DashboardPage() {
             {sites.map((site) => (
               <div
                 key={site.id}
-                className="border border-white/8 rounded-xl p-5 flex flex-col" style={{ background: '#141414' }}
+                className="border border-white/8 rounded-xl p-5 flex flex-col"
+                style={{ background: '#141414' }}
               >
                 <p className="font-bold text-white">{site.name}</p>
                 <p className="text-zinc-500 text-sm mt-1">{site.subdomain}.vibbr.app</p>
