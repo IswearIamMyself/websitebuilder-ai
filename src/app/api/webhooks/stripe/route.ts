@@ -34,8 +34,9 @@ export async function POST(request: NextRequest): Promise<Response> {
 
   try {
     if (event.type === 'checkout.session.completed') {
-      const session = event.data.object as Stripe.Checkout.Session;
-      const { userId, plan, credits } = session.metadata ?? {};
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const session = event.data.object as any;
+      const { userId, plan, credits } = (session.metadata ?? {}) as Record<string, string | undefined>;
 
       if (!userId) {
         console.error('Webhook: missing userId in metadata');
@@ -66,26 +67,40 @@ export async function POST(request: NextRequest): Promise<Response> {
         }
       }
     } else if (event.type === 'invoice.payment_succeeded') {
-      const invoice = event.data.object as Stripe.Invoice;
-      const subscriptionId = typeof (invoice as Stripe.Invoice & { subscription?: string | Stripe.Subscription | null }).subscription === 'string'
-        ? (invoice as Stripe.Invoice & { subscription?: string | Stripe.Subscription | null }).subscription
-        : ((invoice as Stripe.Invoice & { subscription?: string | Stripe.Subscription | null }).subscription as Stripe.Subscription | null)?.id ?? null;
+      // Use customer ID to find the profile and reset credits based on current plan.
+      // This avoids all Stripe subscription type issues.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const invoice = event.data.object as any;
+      const customerId = typeof invoice.customer === 'string'
+        ? invoice.customer
+        : (invoice.customer as { id?: string } | null)?.id ?? null;
 
-      if (subscriptionId) {
-        const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-        const plan = subscription.metadata?.plan as string | undefined;
+      if (!customerId) {
+        console.error('Webhook: missing customer on invoice');
+        return new Response(null, { status: 200 });
+      }
 
-        if (plan) {
-          const userId = subscription.metadata?.userId;
-          const creditAmount = planCredits[plan] ?? 0;
-          if (userId) {
-            const { error } = await db
-              .from('profiles')
-              .update({ credits: creditAmount })
-              .eq('id', userId);
-            if (error) console.error('Webhook: failed to reset credits on renewal:', error.message);
-          }
-        }
+      // Look up the profile whose stripe_customer_id matches
+      const { data: profileData, error: profileError } = await db
+        .from('profiles')
+        .select('id, plan')
+        .eq('stripe_customer_id', customerId)
+        .single();
+
+      if (profileError || !profileData) {
+        // Not fatal — customer may not have a profile row yet
+        return new Response(null, { status: 200 });
+      }
+
+      const profile = profileData as { id: string; plan: string };
+      const creditAmount = planCredits[profile.plan] ?? 0;
+
+      if (creditAmount > 0) {
+        const { error } = await db
+          .from('profiles')
+          .update({ credits: creditAmount })
+          .eq('id', profile.id);
+        if (error) console.error('Webhook: failed to reset credits on renewal:', error.message);
       }
     }
   } catch (e) {
