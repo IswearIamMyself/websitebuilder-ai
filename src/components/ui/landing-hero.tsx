@@ -244,7 +244,7 @@ export default function LandingHero() {
         <Link href="/" className="flex items-center gap-2">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/vibbr-icon.png" alt="Vibbr" className="w-7 h-7 rounded-lg object-cover" />
-          <span className="font-semibold text-white text-lg">Vibbr</span>
+          <span className="font-semibold text-white text-base tracking-tight">Vibbr</span>
         </Link>
         <div className="hidden md:flex items-center gap-8">
           <Link href="/pricing" className="text-white/70 hover:text-white text-sm transition-colors">Pricing</Link>

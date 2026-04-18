@@ -220,7 +220,7 @@ function Sidebar({
         <Link href="/dashboard" className="flex items-center gap-2">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/vibbr-icon.png" alt="Vibbr" className="w-7 h-7 rounded-lg object-cover" />
-          <span className="font-semibold text-white text-base">Vibbr</span>
+          <span className="font-semibold text-white text-base tracking-tight">Vibbr</span>
         </Link>
       </div>
 

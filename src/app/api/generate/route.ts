@@ -35,15 +35,23 @@ interface Site {
 
 /* ─── Helpers ────────────────────────────────────────────────────────────────── */
 
-function cleanJSON(raw: string): string {
-  return raw
-    .replace(/^[\s\S]*?(?=\{)/, '')   // strip everything before first {
-    .replace(/\}[\s\S]*$/, (m) => m.slice(0, m.lastIndexOf('}') + 1)) // trim after last }
-    .replace(/^```json\s*/i, '')
-    .replace(/^```\s*/i, '')
-    .replace(/```\s*$/i, '')
-    .replace(/`/g, '')
+function extractJSON(raw: string): string {
+  // Remove markdown code fences
+  let cleaned = raw
+    .replace(/^```json\s*/im, '')
+    .replace(/^```\s*/im, '')
+    .replace(/```\s*$/im, '')
     .trim();
+
+  // Find first { and last } in case there's text before/after
+  const firstBrace = cleaned.indexOf('{');
+  const lastBrace = cleaned.lastIndexOf('}');
+
+  if (firstBrace === -1 || lastBrace === -1) {
+    throw new Error('No JSON object found in response');
+  }
+
+  return cleaned.slice(firstBrace, lastBrace + 1);
 }
 
 function slugify(text: string): string {
@@ -101,11 +109,11 @@ function createServiceClient() {
 
 /* ─── System prompt ──────────────────────────────────────────────────────────── */
 
-const SYSTEM_PROMPT = `CRITICAL INSTRUCTION: Your ENTIRE response must be raw JSON. The very first character must be { and the very last character must be }. Do NOT wrap in markdown, do NOT use code fences, do NOT write any text before or after the JSON object. Any deviation will break the parser.
+const SYSTEM_PROMPT = `You are Vibbr's website generation engine. IMPORTANT: Your response must be a single raw JSON object only. No markdown, no code fences, no backticks, no explanation. Start with { end with }. Nothing else.
 
-You are Vibbr's website generation engine. Generate complete, production-quality, SEO-optimized websites.
+Generate complete, production-quality, SEO-optimized websites.
 
-Respond ONLY with a valid JSON object, no markdown, no fences:
+Response format:
 {
   "siteName": "short name",
   "description": "one sentence",
@@ -126,12 +134,22 @@ If existingFiles provided, preserve structure and only change what was specifica
 /* ─── Route handler ──────────────────────────────────────────────────────────── */
 
 export async function POST(request: NextRequest): Promise<Response> {
+  // 0. Check required env vars
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return err('Server configuration error', 500);
+  }
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return err('Server configuration error', 500);
+  }
+
   // 1. Authenticate
   const anonClient = await createAnonClient();
   const {
     data: { user },
     error: authError,
   } = await anonClient.auth.getUser();
+
+  console.log('[generate] user:', user?.id);
 
   if (authError || !user) {
     return err('Unauthorized', 401);
@@ -159,6 +177,8 @@ export async function POST(request: NextRequest): Promise<Response> {
     .eq('id', user.id)
     .single();
 
+  console.log('[generate] credits:', profileData?.credits);
+
   if (profileError || !profileData) {
     return err('Profile not found', 404);
   }
@@ -171,7 +191,7 @@ export async function POST(request: NextRequest): Promise<Response> {
 
   // 3. Call Anthropic
   const anthropic = new Anthropic({
-    apiKey: process.env.ANTHROPIC_API_KEY!,
+    apiKey: process.env.ANTHROPIC_API_KEY,
   });
 
   const userMessage =
@@ -209,14 +229,20 @@ export async function POST(request: NextRequest): Promise<Response> {
     return err('Unexpected response format from AI', 502);
   }
 
-  const cleaned = cleanJSON(rawContent.text);
+  console.log('[generate] raw response length:', rawContent.text.length);
+  console.log('[generate] first 200 chars:', rawContent.text.slice(0, 200));
 
   let generated: GeneratedSite;
   try {
+    const cleaned = extractJSON(rawContent.text);
     generated = JSON.parse(cleaned) as GeneratedSite;
-  } catch {
+  } catch (e) {
+    console.error('[generate] JSON parse failed:', e instanceof Error ? e.message : e);
     return err('AI returned invalid JSON', 502);
   }
+
+  console.log('[generate] parsed siteName:', generated?.siteName);
+  console.log('[generate] files count:', generated?.files?.length);
 
   if (
     !generated.siteName ||
@@ -301,7 +327,7 @@ export async function POST(request: NextRequest): Promise<Response> {
 
   if (genError) {
     // Non-fatal — log but don't fail the request
-    console.error('Failed to record generation:', genError.message);
+    console.error('[generate] Failed to record generation:', genError.message);
   }
 
   // 9. Return result

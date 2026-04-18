@@ -58,7 +58,7 @@ export default function SiteNav() {
       {/* Logo */}
       <Link href="/" className="flex items-center shrink-0">
         <img src="/vibbr-icon.png" alt="Vibbr" className="w-7 h-7 rounded-lg object-cover" />
-        <span className="ml-2 font-semibold text-white text-base">Vibbr</span>
+        <span className="ml-2 font-semibold text-white text-base tracking-tight">Vibbr</span>
       </Link>
 
       {/* Center links */}
