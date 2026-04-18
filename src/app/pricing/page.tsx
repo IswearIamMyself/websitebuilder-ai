@@ -36,11 +36,11 @@ export default function PricingPage() {
       <SiteNav />
 
       {/* ── Hero ── */}
-      <section className="pt-32 pb-16 text-center px-6 bg-white">
+      <section className="pt-32 pb-12 md:pb-16 text-center px-4 md:px-6 bg-white">
         <p className="text-zinc-500 text-sm uppercase tracking-widest mb-4">
           Simple, transparent pricing
         </p>
-        <h1 className="text-5xl font-bold text-zinc-900 mb-4 leading-tight">
+        <h1 className="text-3xl md:text-5xl font-bold text-zinc-900 mb-4 leading-tight">
           Pay for what you use
         </h1>
         <p className="text-zinc-400 text-lg">
@@ -49,7 +49,7 @@ export default function PricingPage() {
       </section>
 
       {/* ── Pricing cards ── */}
-      <section className="py-16 px-6" style={{ background: '#FAF9F6' }}>
+      <section className="py-12 md:py-16 px-4 md:px-6" style={{ background: '#FAF9F6' }}>
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
 
           {/* Free */}

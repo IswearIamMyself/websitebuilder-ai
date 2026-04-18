@@ -4,9 +4,6 @@ import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
-import { VibbrLogoHorizontal } from '@/components/ui/vibbr-logo';
-
-const fontImport = `@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap');`;
 
 function GoogleIcon({ className }: { className?: string }) {
   return (
@@ -105,17 +102,13 @@ function AuthPageContent() {
 
   return (
     <>
-      <style>{fontImport}</style>
-      <style>{`* { font-family: 'Syne', sans-serif; }`}</style>
-
-      <div
-        className="min-h-screen flex flex-col items-center justify-center px-4"
-        style={{ background: '#0f0f0f' }}
-      >
+      <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-zinc-950">
         <div className="w-full max-w-md">
           {/* Logo */}
-          <Link href="/" className="flex justify-center mb-10">
-            <VibbrLogoHorizontal />
+          <Link href="/" className="flex items-center justify-center gap-2 mb-10">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/vibbr-icon.png" alt="Vibbr" className="w-8 h-8 rounded-xl object-cover" />
+            <span className="font-bold text-white text-xl">Vibbr</span>
           </Link>
 
           {/* Panel */}
@@ -207,7 +200,7 @@ function AuthPageContent() {
               <button
                 type="submit"
                 disabled={loadingPassword || loadingGoogle}
-                className="mt-1 w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-orange-500 hover:bg-orange-400 active:bg-orange-600 text-white text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-orange-900/30"
+                className="mt-1 w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-white hover:bg-zinc-100 active:bg-zinc-200 text-zinc-900 text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loadingPassword && <Spinner />}
                 {loadingPassword
@@ -231,7 +224,7 @@ function AuthPageContent() {
 
 export default function AuthPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen" style={{ background: '#0f0f0f' }} />}>
+    <Suspense fallback={<div className="min-h-screen bg-zinc-950" />}>
       <AuthPageContent />
     </Suspense>
   );

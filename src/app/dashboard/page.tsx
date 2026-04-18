@@ -6,6 +6,14 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { PromptInputBox } from '@/components/ui/ai-prompt-box';
 
+const LOADING_MESSAGES = [
+  'Generating your site...',
+  'Writing HTML & CSS...',
+  'Adding SEO tags...',
+  'Building your pages...',
+  'Almost ready...',
+];
+
 interface Site {
   id: string;
   name: string;
@@ -27,6 +35,7 @@ function DashboardContent() {
   const [sites, setSites] = useState<Site[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
+  const [loadingMsg, setLoadingMsg] = useState(LOADING_MESSAGES[0]);
   const [error, setError] = useState<string | null>(null);
 
   const autoSubmitFiredRef = useRef(false);
@@ -60,7 +69,13 @@ function DashboardContent() {
   async function handleSend(message: string) {
     if (!message.trim()) return;
     setError(null);
+    setLoadingMsg(LOADING_MESSAGES[0]);
     setGenerating(true);
+    let msgIdx = 0;
+    const msgTimer = setInterval(() => {
+      msgIdx = (msgIdx + 1) % LOADING_MESSAGES.length;
+      setLoadingMsg(LOADING_MESSAGES[msgIdx]);
+    }, 2000);
     try {
       const res = await fetch('/api/generate', {
         method: 'POST',
@@ -73,6 +88,8 @@ function DashboardContent() {
     } catch (e) {
       setGenerating(false);
       setError(e instanceof Error ? e.message : 'Something went wrong');
+    } finally {
+      clearInterval(msgTimer);
     }
   }
 
@@ -88,9 +105,12 @@ function DashboardContent() {
     <>
       {/* Full-screen generating overlay */}
       {generating && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 flex-col gap-4" style={{ background: 'rgba(15,15,15,0.95)' }}>
-          <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
-          <p className="text-white font-medium">Generating your site...</p>
+        <div className="fixed inset-0 flex items-center justify-center z-50 flex-col gap-5" style={{ background: 'rgba(15,15,15,0.96)' }}>
+          <div className="w-10 h-10 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+          <div className="text-center">
+            <p className="text-white font-semibold text-lg">{loadingMsg}</p>
+            <p className="text-zinc-500 text-sm mt-1">This takes about 15–30 seconds</p>
+          </div>
         </div>
       )}
 
@@ -111,7 +131,12 @@ function DashboardContent() {
               placeholder="Describe the site you want to build..."
             />
             {error && (
-              <p className="mt-3 text-sm text-red-400 text-center">{error}</p>
+              <div className="mt-3 flex items-center justify-between gap-3 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+                <span>{error}</span>
+                <button type="button" onClick={() => setError(null)} className="text-xs font-medium text-red-300 hover:text-red-200 shrink-0 underline">
+                  Try again
+                </button>
+              </div>
             )}
           </div>
 
@@ -139,7 +164,12 @@ function DashboardContent() {
               placeholder="Build something new..."
             />
             {error && (
-              <p className="mt-3 text-sm text-red-400">{error}</p>
+              <div className="mt-3 flex items-center justify-between gap-3 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+                <span>{error}</span>
+                <button type="button" onClick={() => setError(null)} className="text-xs font-medium text-red-300 hover:text-red-200 shrink-0 underline">
+                  Try again
+                </button>
+              </div>
             )}
           </div>
 

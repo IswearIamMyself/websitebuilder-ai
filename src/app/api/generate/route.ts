@@ -35,6 +35,17 @@ interface Site {
 
 /* ─── Helpers ────────────────────────────────────────────────────────────────── */
 
+function cleanJSON(raw: string): string {
+  return raw
+    .replace(/^[\s\S]*?(?=\{)/, '')   // strip everything before first {
+    .replace(/\}[\s\S]*$/, (m) => m.slice(0, m.lastIndexOf('}') + 1)) // trim after last }
+    .replace(/^```json\s*/i, '')
+    .replace(/^```\s*/i, '')
+    .replace(/```\s*$/i, '')
+    .replace(/`/g, '')
+    .trim();
+}
+
 function slugify(text: string): string {
   return text
     .toLowerCase()
@@ -90,7 +101,9 @@ function createServiceClient() {
 
 /* ─── System prompt ──────────────────────────────────────────────────────────── */
 
-const SYSTEM_PROMPT = `You are Vibbr's website generation engine. Generate complete, production-quality, SEO-optimized websites.
+const SYSTEM_PROMPT = `CRITICAL INSTRUCTION: Your ENTIRE response must be raw JSON. The very first character must be { and the very last character must be }. Do NOT wrap in markdown, do NOT use code fences, do NOT write any text before or after the JSON object. Any deviation will break the parser.
+
+You are Vibbr's website generation engine. Generate complete, production-quality, SEO-optimized websites.
 
 Respond ONLY with a valid JSON object, no markdown, no fences:
 {
@@ -196,11 +209,7 @@ export async function POST(request: NextRequest): Promise<Response> {
     return err('Unexpected response format from AI', 502);
   }
 
-  const cleaned = rawContent.text
-    .replace(/^```json\s*/i, '')
-    .replace(/^```\s*/i, '')
-    .replace(/```\s*$/i, '')
-    .trim();
+  const cleaned = cleanJSON(rawContent.text);
 
   let generated: GeneratedSite;
   try {

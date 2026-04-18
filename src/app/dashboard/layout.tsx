@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { VibbrLogoHorizontal } from '@/components/ui/vibbr-logo';
 
 interface Site {
   id: string;
@@ -99,8 +98,7 @@ function WorkspaceDropdown({
 }) {
   const planLabel = plan.charAt(0).toUpperCase() + plan.slice(1);
   const planColor = planColors[plan] ?? planColors.free;
-  const startingCredits = STARTING_CREDITS[plan] ?? 1;
-  const fillPct = Math.min(100, Math.round((credits / startingCredits) * 100));
+  const fillPct = Math.min(100, Math.round((credits / 30) * 100));
   const [showComingSoon, setShowComingSoon] = useState(false);
 
   function handleCreateWorkspace() {
@@ -219,7 +217,11 @@ function Sidebar({
     >
       {/* ── Logo ── */}
       <div className="px-4 py-3 border-b border-white/5">
-        <VibbrLogoHorizontal />
+        <Link href="/dashboard" className="flex items-center gap-2">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/vibbr-icon.png" alt="Vibbr" className="w-7 h-7 rounded-lg object-cover" />
+          <span className="font-semibold text-white text-base">Vibbr</span>
+        </Link>
       </div>
 
       {/* ── Workspace selector ── */}
@@ -378,7 +380,7 @@ export default function DashboardLayout({
   else if (pathname?.match(/\/dashboard\/[^/]+$/)) pageTitle = 'Site Editor';
 
   return (
-    <div className="flex min-h-screen" style={{ background: '#0f0f0f', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+    <div className="flex min-h-screen" style={{ background: '#0f0f0f' }}>
       <Sidebar sites={sites} profile={profile} email={email} />
 
       <div className="ml-64 flex-1 flex flex-col min-h-screen">

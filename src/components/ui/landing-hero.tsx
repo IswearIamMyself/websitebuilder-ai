@@ -173,8 +173,8 @@ function FeatureRow({ title, description, subs, mockup, visualLeft }: FeatureRow
   const visual = <div>{mockup}</div>;
 
   return (
-    <div className="bg-white border border-zinc-100 rounded-2xl p-8 mb-6">
-      <div className="grid grid-cols-2 gap-12 items-center">
+    <div className="bg-white border border-zinc-100 rounded-2xl p-6 md:p-8 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
         {visualLeft ? <>{visual}{text}</> : <>{text}{visual}</>}
       </div>
     </div>
@@ -188,8 +188,8 @@ function FAQSection() {
 
   return (
     <section className="py-24 px-6" style={{ background: '#fff' }}>
-      <div className="max-w-4xl mx-auto flex gap-16">
-        <div className="w-1/3 shrink-0">
+      <div className="max-w-4xl mx-auto flex flex-col md:flex-row gap-8 md:gap-16">
+        <div className="md:w-1/3 shrink-0">
           <h2 className="text-4xl font-bold text-zinc-900 leading-tight">
             Frequently asked questions
           </h2>
@@ -278,7 +278,7 @@ export default function LandingHero() {
           <p className="text-white/60 text-sm mb-4">Build something Vibbr</p>
 
           <h1 style={{
-            fontSize: 'clamp(48px, 8vw, 96px)',
+            fontSize: 'clamp(32px, 8vw, 96px)',
             fontWeight: 800,
             color: 'white',
             lineHeight: 1.0,
