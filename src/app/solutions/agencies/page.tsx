@@ -48,6 +48,18 @@ const data: SolutionData = {
       mockup: 'edit',
       visualLeft: true,
     },
+    {
+      gradient: 'linear-gradient(135deg, #10b981, #06b6d4)',
+      title: 'The ROI speaks for itself',
+      description: 'At €79/month, Vibbr Pro costs less than one billable hour. Deliver 10 client sites per month and the maths is simple: maximum margin, zero compromise on quality.',
+      subs: [
+        { title: 'Cost per site', desc: 'Under €8 per generation on Pro' },
+        { title: 'Time saved', desc: '~3 days per project → 3 minutes' },
+        { title: 'Reinvest or keep', desc: 'Pass savings to clients or grow margin' },
+      ],
+      mockup: 'roi',
+      visualLeft: false,
+    },
   ],
   testimonial: {
     quote: 'I generated a full restaurant website in front of my client during our discovery call. They signed the contract on the spot.',

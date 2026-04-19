@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { ChevronDown } from 'lucide-react';
-import { VibbrLogoMark } from '@/components/ui/vibbr-logo';
 
 const SOLUTIONS = [
   {
@@ -56,8 +55,10 @@ export default function SiteNav() {
       style={{ background: 'rgba(15,15,18,0.8)' }}
     >
       {/* Logo */}
-      <Link href="/" className="flex items-center shrink-0">
-        <VibbrLogoMark />
+      <Link href="/" className="flex items-center gap-2 shrink-0">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/vibbr-icon.png" alt="Vibbr" className="w-6 h-6 object-contain" />
+        <span className="font-semibold text-white text-sm">Vibbr</span>
       </Link>
 
       {/* Center links */}

@@ -11,9 +11,10 @@ const data: SolutionData = {
   heading: 'Your business online. No developer needed.',
   subtext: 'Describe your business and get a professional website with SEO, contact forms, and your domain — in under a minute.',
   sectionHeader: 'What businesses build with Vibbr',
+  heroBackground: 'linear-gradient(160deg, #0a1628 0%, #0d2137 20%, #0e4d5c 40%, #0f6b50 65%, #1a8a3a 100%)',
   features: [
     {
-      gradient: 'linear-gradient(135deg, #f97316, #ec4899)',
+      gradient: 'linear-gradient(135deg, #f97316, #fbbf24)',
       title: 'Just describe your business',
       description: "Tell Vibbr what you do, where you are, and who your customers are. We write the copy, design the layout, and build the code. You just describe it.",
       subs: [
@@ -25,7 +26,7 @@ const data: SolutionData = {
       visualLeft: true,
     },
     {
-      gradient: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
+      gradient: 'linear-gradient(135deg, #10b981, #3b82f6)',
       title: 'Rank on Google from day one',
       description: "Every Vibbr site includes everything Google needs to find you — meta tags, business schema, sitemap and more. No SEO agency required.",
       subs: [
@@ -37,7 +38,7 @@ const data: SolutionData = {
       visualLeft: false,
     },
     {
-      gradient: 'linear-gradient(135deg, #10b981, #3b82f6)',
+      gradient: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
       title: 'Your domain, your brand',
       description: "Connect your own domain in minutes. Your site lives at yourbusiness.com — not some template platform subdomain. Professional from day one.",
       subs: [

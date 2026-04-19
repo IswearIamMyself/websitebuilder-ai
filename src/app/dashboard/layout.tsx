@@ -319,9 +319,6 @@ function Sidebar({
             className="flex items-center gap-2 w-full rounded-lg px-3 py-2 hover:bg-[#222] transition-colors"
             style={{ background: '#1a1a1a' }}
           >
-            <span className="w-6 h-6 rounded-md bg-orange-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
-              V
-            </span>
             <span className="text-white text-sm font-medium flex-1 text-left truncate">My Workspace</span>
             <ChevronDownIcon />
           </button>

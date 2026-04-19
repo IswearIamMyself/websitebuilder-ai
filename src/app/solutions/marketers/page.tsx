@@ -11,9 +11,10 @@ const data: SolutionData = {
   heading: 'Landing pages that rank and convert',
   subtext: 'Ship SEO-optimized landing pages in seconds. No developer. No CMS. No waiting. Just describe it and go live.',
   sectionHeader: 'What marketers build with Vibbr',
+  heroBackground: 'linear-gradient(160deg, #0a0f0a 0%, #0d2818 18%, #0f4d2e 36%, #1a7a3a 58%, #2ecc71 80%, #f97316 100%)',
   features: [
     {
-      gradient: 'linear-gradient(135deg, #10b981, #0d9488)',
+      gradient: 'linear-gradient(135deg, #10b981, #06b6d4)',
       title: 'Campaign pages in seconds',
       description: 'New product launch? Event page? Promo landing page? Describe it, generate it, go live. No engineering bottleneck. No CMS limitations. Ship while the idea is hot.',
       subs: [

@@ -4,7 +4,7 @@ import { VibbrLogoMarkDark } from '@/components/ui/vibbr-logo';
 
 /* ─── Types ──────────────────────────────────────────────────────────────────── */
 
-export type MockupType = 'terminal' | 'seo' | 'edit' | 'domain';
+export type MockupType = 'terminal' | 'seo' | 'edit' | 'domain' | 'roi';
 
 export interface SolutionSub {
   title: string;
@@ -31,6 +31,7 @@ export interface SolutionData {
     name: string;
     role: string;
   };
+  heroBackground?: string;
 }
 
 /* ─── Constants ──────────────────────────────────────────────────────────────── */
@@ -150,10 +151,37 @@ function DomainMockup({ gradient }: { gradient: string }) {
   );
 }
 
+function RoiMockup({ gradient }: { gradient: string }) {
+  const rows = [
+    { label: 'Sites per month', value: '10', highlight: false },
+    { label: 'Avg. client fee', value: '€1,500', highlight: false },
+    { label: 'Monthly revenue', value: '€15,000', highlight: true },
+    { label: 'Vibbr cost', value: '€79/mo', highlight: false },
+    { label: 'Net margin', value: '99.5%', highlight: true },
+  ];
+  return (
+    <div className="rounded-xl overflow-hidden border border-zinc-100 shadow-sm">
+      <div className="h-24" style={{ background: gradient }} />
+      <div className="bg-white p-6">
+        <p className="text-xs text-zinc-400 uppercase tracking-wider mb-4">ROI Calculator</p>
+        <div className="flex flex-col gap-2">
+          {rows.map((row) => (
+            <div key={row.label} className="flex justify-between items-center text-sm border-b border-zinc-50 pb-2 last:border-0 last:pb-0">
+              <span className="text-zinc-600">{row.label}</span>
+              <span className={row.highlight ? 'text-green-600 font-bold' : 'text-zinc-800 font-medium'}>{row.value}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function renderMockup(type: MockupType, gradient: string) {
   if (type === 'seo') return <SeoMockup gradient={gradient} />;
   if (type === 'edit') return <EditMockup gradient={gradient} />;
   if (type === 'domain') return <DomainMockup gradient={gradient} />;
+  if (type === 'roi') return <RoiMockup gradient={gradient} />;
   return <TerminalMockup gradient={gradient} />;
 }
 
@@ -167,15 +195,17 @@ export default function SolutionPage({ data }: { data: SolutionData }) {
       <SiteNav />
 
       {/* ── Hero ── */}
-      <div style={{ background: '#0a0a0f', position: 'relative', overflow: 'hidden', minHeight: '70vh' }}>
-        <div
-          style={{
-            position: 'absolute', inset: 0,
-            background: AURORA,
-            animation: 'auroraShift 15s ease-in-out infinite alternate',
-            pointerEvents: 'none',
-          }}
-        />
+      <div style={{ background: data.heroBackground ?? '#0a0a0f', position: 'relative', overflow: 'hidden', minHeight: '70vh' }}>
+        {!data.heroBackground && (
+          <div
+            style={{
+              position: 'absolute', inset: 0,
+              background: AURORA,
+              animation: 'auroraShift 15s ease-in-out infinite alternate',
+              pointerEvents: 'none',
+            }}
+          />
+        )}
         <section
           className="relative z-10 flex flex-col items-center justify-center text-center px-6 pt-14"
           style={{ minHeight: '70vh' }}

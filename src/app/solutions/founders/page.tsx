@@ -11,9 +11,10 @@ const data: SolutionData = {
   heading: 'Validate your idea before you build it',
   subtext: 'Launch a professional landing page for your startup in 60 seconds. Collect emails, test your messaging, and validate demand — before writing a single line of backend code.',
   sectionHeader: 'What founders build with Vibbr',
+  heroBackground: 'linear-gradient(160deg, #020514 0%, #0d1b4e 20%, #1a2d8a 38%, #2d4fcc 56%, #7c3aed 78%, #a855f7 100%)',
   features: [
     {
-      gradient: 'linear-gradient(135deg, #8b5cf6, #ec4899)',
+      gradient: 'linear-gradient(135deg, #7c3aed, #ec4899)',
       title: 'Ship your landing page today',
       description: 'Stop waiting to build the perfect product before telling the world. Describe your startup idea and get a professional landing page live in under a minute. Start collecting emails while you build.',
       subs: [
@@ -25,7 +26,7 @@ const data: SolutionData = {
       visualLeft: true,
     },
     {
-      gradient: 'linear-gradient(135deg, #f97316, #eab308)',
+      gradient: 'linear-gradient(135deg, #f97316, #fbbf24)',
       title: 'Test your messaging fast',
       description: "Not sure which angle resonates? Generate three different versions of your landing page with different headlines and value props. Test them, pick the winner, move on.",
       subs: [

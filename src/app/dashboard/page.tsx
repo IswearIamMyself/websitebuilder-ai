@@ -39,7 +39,7 @@ const CARD_GRADIENTS = [
 ];
 
 const HERO_GRADIENT =
-  'linear-gradient(160deg, #1a0533 0%, #2d1b69 20%, #4a1080 35%, #c2185b 55%, #e91e8c 70%, #f97316 85%, #ff6b35 100%)';
+  'linear-gradient(170deg, #0d0d1a 0%, #1a0d2e 15%, #2d1b4e 28%, #6b2d6b 45%, #c2185b 62%, #e91e8c 75%, #f97316 88%, #ff8c42 100%)';
 
 /* ─── Types ──────────────────────────────────────────────────────────────────── */
 
@@ -62,8 +62,7 @@ function cardGradient(seed: string): string {
 
 function firstNameFromEmail(email: string): string {
   const local = email.split('@')[0] ?? '';
-  const first = local.split(/[._\-+]/)[0] ?? local;
-  return first.charAt(0).toUpperCase() + first.slice(1).toLowerCase();
+  return local.charAt(0).toUpperCase() + local.slice(1).toLowerCase();
 }
 
 function daysAgo(iso: string): string {
@@ -156,23 +155,45 @@ function SiteCard({ site }: { site: Site }) {
   );
 }
 
-/* ─── Template placeholder card ─────────────────────────────────────────────── */
+/* ─── Template card ──────────────────────────────────────────────────────────── */
 
-function TemplateCard({ label, gradient }: { label: string; gradient: string }) {
+const TEMPLATES = [
+  {
+    label: 'Moving Company',
+    gradient: 'linear-gradient(135deg, #f97316, #fbbf24)',
+    prompt: 'Moving company website for a local moving and storage business. Include a hero section, list of services (local moves, long-distance, storage), pricing tiers, customer testimonials, and a contact form with a "Get a free quote" call to action.',
+  },
+  {
+    label: 'Personal Portfolio',
+    gradient: 'linear-gradient(135deg, #667eea, #764ba2)',
+    prompt: 'Personal portfolio website for a freelance web designer. Include a hero section with a short bio, a projects gallery with case study previews, a skills section, client testimonials, and a contact form.',
+  },
+  {
+    label: 'Restaurant',
+    gradient: 'linear-gradient(135deg, #f97316, #ec4899)',
+    prompt: 'Restaurant website for an upscale Italian restaurant. Include an atmospheric hero section, a menu with categories, an online reservations section, location map with address and opening hours, and a gallery of signature dishes.',
+  },
+];
+
+function TemplateCard({ label, gradient, prompt, onUse }: { label: string; gradient: string; prompt: string; onUse: (p: string) => void }) {
   return (
-    <div className="bg-[#1a1a1a] rounded-2xl overflow-hidden opacity-50 select-none">
+    <button
+      type="button"
+      onClick={() => onUse(prompt)}
+      className="bg-[#1a1a1a] rounded-2xl overflow-hidden cursor-pointer hover:ring-1 hover:ring-white/15 transition-all text-left group w-full"
+    >
       <div className="h-40 relative" style={{ background: gradient }}>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="bg-black/40 text-white text-xs px-3 py-1 rounded-full font-medium backdrop-blur-sm">
-            Coming soon
+          <span className="bg-black/30 text-white text-xs px-3 py-1 rounded-full font-medium backdrop-blur-sm group-hover:bg-black/50 transition-colors">
+            Use template →
           </span>
         </div>
       </div>
       <div className="p-4">
-        <p className="text-zinc-500 text-sm font-medium">{label}</p>
-        <p className="text-zinc-700 text-xs mt-0.5">Template</p>
+        <p className="text-white text-sm font-medium">{label}</p>
+        <p className="text-zinc-600 text-xs mt-0.5">Click to generate</p>
       </div>
-    </div>
+    </button>
   );
 }
 
@@ -322,8 +343,7 @@ function DashboardContent() {
                   key={chip}
                   type="button"
                   onClick={() => handleSend(chip)}
-                  className="px-4 py-2 rounded-full text-sm text-white/80 hover:text-white cursor-pointer border border-white/20 hover:bg-white/10 transition-colors backdrop-blur-sm"
-                  style={{ background: 'rgba(255,255,255,0.08)' }}
+                  className="px-4 py-2 rounded-full text-sm text-white hover:text-white cursor-pointer border border-white/20 hover:bg-white/15 transition-colors backdrop-blur-sm bg-white/10"
                 >
                   {chip}
                 </button>
@@ -371,15 +391,25 @@ function DashboardContent() {
               <SiteCard key={site.id} site={site} />
             ))}
           </div>
+
+          {/* Templates below grid */}
+          <div className="mt-10 border-t border-white/5 pt-8">
+            <p className="text-zinc-600 text-sm font-medium uppercase tracking-wider mb-6">Templates</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {TEMPLATES.map((t) => (
+                <TemplateCard key={t.label} label={t.label} gradient={t.gradient} prompt={t.prompt} onUse={handleSend} />
+              ))}
+            </div>
+          </div>
         </div>
       ) : (
         /* ── Empty state — template cards below hero ── */
         <div className="bg-[#0f0f0f] px-6 py-12">
           <p className="text-zinc-600 text-sm font-medium uppercase tracking-wider mb-6">Templates</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <TemplateCard label="Restaurant" gradient="linear-gradient(135deg, #f97316, #ec4899)" />
-            <TemplateCard label="Portfolio" gradient="linear-gradient(135deg, #667eea, #764ba2)" />
-            <TemplateCard label="SaaS Landing" gradient="linear-gradient(135deg, #4facfe, #00f2fe)" />
+            {TEMPLATES.map((t) => (
+              <TemplateCard key={t.label} label={t.label} gradient={t.gradient} prompt={t.prompt} onUse={handleSend} />
+            ))}
           </div>
         </div>
       )}
