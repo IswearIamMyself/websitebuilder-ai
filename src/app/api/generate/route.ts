@@ -217,15 +217,10 @@ export async function POST(request: NextRequest): Promise<Response> {
   }
 
   // 4. Parse JSON from response
-  const rawContent = anthropicResponse.content[0];
-  if (!rawContent || rawContent.type !== 'text') {
-    return err('Unexpected response format from AI', 502);
-  }
-
-  console.log('[generate] raw response length:', rawContent.text.length);
-  console.log('[generate] first 200 chars:', rawContent.text.slice(0, 200));
-
-  const rawText = rawContent.text;
+  const rawText = anthropicResponse.content
+    .filter((block: { type: string }) => block.type === 'text')
+    .map((block: { type: string; text?: string }) => (block as { type: 'text'; text: string }).text)
+    .join('');
   console.log('[VIBBR] Raw response start:', rawText.substring(0, 500));
   console.log('[VIBBR] Raw response end:', rawText.slice(-200));
 
