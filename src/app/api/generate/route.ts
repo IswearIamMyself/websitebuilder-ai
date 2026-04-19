@@ -1,3 +1,5 @@
+export const maxDuration = 60;
+
 import Anthropic from '@anthropic-ai/sdk';
 import { createServerClient } from '@supabase/ssr';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
@@ -36,22 +38,13 @@ interface Site {
 /* ─── Helpers ────────────────────────────────────────────────────────────────── */
 
 function extractJSON(raw: string): string {
-  // Remove markdown code fences
-  let cleaned = raw
-    .replace(/^```json\s*/im, '')
-    .replace(/^```\s*/im, '')
-    .replace(/```\s*$/im, '')
-    .trim();
-
-  // Find first { and last } in case there's text before/after
+  const cleaned = raw.replace(/^```[\w]*\n?/gm, '').replace(/^```$/gm, '').trim();
   const firstBrace = cleaned.indexOf('{');
   const lastBrace = cleaned.lastIndexOf('}');
-
   if (firstBrace === -1 || lastBrace === -1) {
-    throw new Error('No JSON object found in response');
+    throw new Error(`No JSON found. Raw start: ${raw.substring(0, 300)}`);
   }
-
-  return cleaned.slice(firstBrace, lastBrace + 1);
+  return cleaned.substring(firstBrace, lastBrace + 1);
 }
 
 function slugify(text: string): string {
@@ -203,7 +196,7 @@ export async function POST(request: NextRequest): Promise<Response> {
   try {
     anthropicResponse = await anthropic.messages.create({
       model: 'claude-sonnet-4-5',
-      max_tokens: 8000,
+      max_tokens: 16000,
       system: [
         {
           type: 'text',
@@ -232,9 +225,13 @@ export async function POST(request: NextRequest): Promise<Response> {
   console.log('[generate] raw response length:', rawContent.text.length);
   console.log('[generate] first 200 chars:', rawContent.text.slice(0, 200));
 
+  const rawText = rawContent.text;
+  console.log('[VIBBR] Raw response start:', rawText.substring(0, 500));
+  console.log('[VIBBR] Raw response end:', rawText.slice(-200));
+
   let generated: GeneratedSite;
   try {
-    const cleaned = extractJSON(rawContent.text);
+    const cleaned = extractJSON(rawText);
     generated = JSON.parse(cleaned) as GeneratedSite;
   } catch (e) {
     console.error('[generate] JSON parse failed:', e instanceof Error ? e.message : e);
