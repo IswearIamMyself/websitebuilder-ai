@@ -53,7 +53,6 @@ function AuthPageContent() {
         const { error: authError } = await supabase.auth.signInWithPassword({
           email,
           password,
-          options: { persistSession: true },
         });
         if (authError) throw authError;
       } else {
