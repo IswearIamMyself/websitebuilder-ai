@@ -4,6 +4,7 @@ import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
+import { VibbrLogoMark } from '@/components/ui/vibbr-logo';
 
 function Spinner() {
   return (
@@ -75,10 +76,8 @@ function AuthPageContent() {
     <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-zinc-950">
       <div className="w-full max-w-md">
         {/* Logo */}
-        <Link href="/" className="flex items-center justify-center gap-2 mb-10">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/vibbr-icon.png" alt="Vibbr" className="w-7 h-7 rounded-lg object-cover" />
-          <span className="font-semibold text-white text-base tracking-tight">Vibbr</span>
+        <Link href="/" className="flex justify-center mb-10">
+          <VibbrLogoMark />
         </Link>
 
         {/* Panel */}

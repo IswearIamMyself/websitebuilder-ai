@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import SiteNav from '@/components/ui/site-nav';
+import { VibbrLogoMarkDark } from '@/components/ui/vibbr-logo';
 import FAQAccordion from '@/components/ui/faq-accordion';
 import CheckoutButton from '@/components/ui/checkout-button';
 
@@ -221,9 +222,7 @@ export default function PricingPage() {
       <footer className="border-t border-zinc-100 py-10 px-6 bg-white">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/vibbr-icon.png" alt="Vibbr" className="w-7 h-7 rounded-lg object-cover" />
-            <span className="font-semibold text-zinc-900">Vibbr</span>
+            <VibbrLogoMarkDark />
             <span className="text-zinc-400 text-xs ml-1">© 2025</span>
           </div>
           <div className="flex items-center gap-8">

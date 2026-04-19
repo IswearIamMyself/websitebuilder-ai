@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { VibbrLogoMark } from '@/components/ui/vibbr-logo';
 import { usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
@@ -217,10 +218,8 @@ function Sidebar({
     >
       {/* ── Logo ── */}
       <div className="px-4 py-3 border-b border-white/5">
-        <Link href="/dashboard" className="flex items-center gap-2">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/vibbr-icon.png" alt="Vibbr" className="w-7 h-7 rounded-lg object-cover" />
-          <span className="font-semibold text-white text-base tracking-tight">Vibbr</span>
+        <Link href="/dashboard">
+          <VibbrLogoMark />
         </Link>
       </div>
 

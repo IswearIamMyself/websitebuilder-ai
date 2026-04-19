@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { PromptInputBox } from '@/components/ui/ai-prompt-box';
+import { VibbrLogoMark, VibbrLogoMarkDark } from '@/components/ui/vibbr-logo';
 
 /* ─── CSS ────────────────────────────────────────────────────────────────────── */
 
@@ -241,10 +242,8 @@ export default function LandingHero() {
         className="fixed top-0 left-0 right-0 h-14 flex items-center justify-between px-6 z-50 backdrop-blur-sm"
         style={{ background: 'rgba(10,10,15,0.75)' }}
       >
-        <Link href="/" className="flex items-center gap-2">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/vibbr-icon.png" alt="Vibbr" className="w-7 h-7 rounded-lg object-cover" />
-          <span className="font-semibold text-white text-base tracking-tight">Vibbr</span>
+        <Link href="/">
+          <VibbrLogoMark />
         </Link>
         <div className="hidden md:flex items-center gap-8">
           <Link href="/pricing" className="text-white/70 hover:text-white text-sm transition-colors">Pricing</Link>
@@ -427,9 +426,7 @@ export default function LandingHero() {
       <footer className="border-t border-zinc-100 py-10 px-6" style={{ background: '#fff' }}>
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/vibbr-icon.png" alt="Vibbr" className="w-7 h-7 rounded-lg object-cover" />
-            <span className="font-semibold text-zinc-900">Vibbr</span>
+            <VibbrLogoMarkDark />
             <span className="text-zinc-400 text-xs ml-1">© 2025</span>
           </div>
           <div className="flex items-center gap-8">

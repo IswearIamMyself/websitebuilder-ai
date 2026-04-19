@@ -1,9 +1,9 @@
 'use client';
 
-/* eslint-disable @next/next/no-img-element */
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { ChevronDown } from 'lucide-react';
+import { VibbrLogoMark } from '@/components/ui/vibbr-logo';
 
 const SOLUTIONS = [
   {
@@ -57,8 +57,7 @@ export default function SiteNav() {
     >
       {/* Logo */}
       <Link href="/" className="flex items-center shrink-0">
-        <img src="/vibbr-icon.png" alt="Vibbr" className="w-7 h-7 rounded-lg object-cover" />
-        <span className="ml-2 font-semibold text-white text-base tracking-tight">Vibbr</span>
+        <VibbrLogoMark />
       </Link>
 
       {/* Center links */}
